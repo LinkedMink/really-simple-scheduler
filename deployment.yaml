@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: really-simple-scheduler
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: really-simple-scheduler
+  template:
+    metadata:
+      labels:
+        app: really-simple-scheduler
+    spec:
+      nodeSelector:
+        "kubernetes.io/os": linux
+      containers:
+      - name: really-simple-scheduler
+        image: linkedmink/really-simple-scheduler
+        ports:
+        - containerPort: 8080
+        env:
+        - name: ALLOWED_ORIGINS
+          value: '["https://wiki-circuit.linkedmink.space","http://wiki-circuit.linkedmink.space"]'
+        - name: REDIS_MODE
+          value: "Sentinal"
+        - name: REDIS_HOSTS
+          value: '[{ "host": "my-redis-sentinal.local", "port": 26379 }]'
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: really-simple-scheduler
+spec:
+  ports:
+  - port: 8080
+  selector:
+    app: really-simple-scheduler
