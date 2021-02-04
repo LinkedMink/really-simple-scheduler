@@ -1,18 +1,37 @@
 import fs from "fs";
 
 import { initializeLogger, Logger } from "../infastructure/Logger";
-import {
-  generateSwaggerDoc,
-  DEFAULT_SWAGGER_DOC_FILE,
-} from "../infastructure/Swagger";
 
 initializeLogger();
 const logger = Logger.get();
 
-logger.info("Generate Swagger Doc - Start");
+const main = async () => {
+  let docFilePath = process.argv.length > 2 ? process.argv[2] : ''
+  
+  const swaggerDoc = await import("../infastructure/Swagger").then(m => {
+    if (!docFilePath) {
+      docFilePath = m.DEFAULT_SWAGGER_DOC_FILE
+    }
 
-const docObject = generateSwaggerDoc();
-const docData = JSON.stringify(docObject, undefined, 2);
-fs.writeFileSync(DEFAULT_SWAGGER_DOC_FILE, docData);
+    logger.info("Generate Swagger Doc - Start");
+    return m.generateSwaggerDoc()
+  }).catch((e) => {
+    Logger.get().info("Generate Swagger Doc - End - Swagger Disabled")
+    Logger.get().verbose(e)
+    process.exit(0)
+  });
 
-logger.info("Generate Swagger Doc - End");
+  logger.info("Generate Swagger Doc - End");
+
+  const docData = JSON.stringify(swaggerDoc, undefined, 2);
+  fs.writeFileSync(docFilePath, docData);
+  
+  logger.info(`Swagger Doc Written: ${docFilePath}`);
+}
+
+try {
+  void main();
+} catch(e) {
+  logger.error(e);
+  process.exit(1)
+}
