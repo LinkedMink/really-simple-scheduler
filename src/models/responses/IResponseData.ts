@@ -58,5 +58,5 @@ export const response = {
   success: <T>(data: T | null = null): IResponseData<T> =>
     ({ status: ResponseStatus.Success, data } as IResponseData<T>),
   failed: <T>(data: T | null = null): IResponseData<T> =>
-    ({ status: ResponseStatus.Failed, data } as IResponseData<T>)
-}
+    ({ status: ResponseStatus.Failed, data } as IResponseData<T>),
+};

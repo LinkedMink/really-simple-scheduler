@@ -177,10 +177,7 @@ describe(path.basename(__filename, ".test.ts"), () => {
 
   test("should handle connection ", () => {
     // Arrange
-    const getProgressHandler = getRouteHandler(
-      "/job/progress/.websocket",
-      "get"
-    );
+    const getProgressHandler = getRouteHandler("/job/progress/.websocket", "get");
     const mockHttp = getMockRequestResponse();
 
     // Act

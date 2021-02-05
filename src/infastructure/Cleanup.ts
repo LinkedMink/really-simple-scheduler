@@ -11,9 +11,7 @@ export const executeOnExit = (handler = NoOpHandler): void => {
     process.stdin.resume();
     const handlerResult = handler();
     if (handlerResult instanceof Promise) {
-      handlerResult
-        .then(result => process.exit(result))
-        .catch(() => process.exit(1));
+      handlerResult.then(result => process.exit(result)).catch(() => process.exit(1));
     } else {
       process.exit(handlerResult);
     }

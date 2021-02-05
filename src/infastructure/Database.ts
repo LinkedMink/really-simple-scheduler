@@ -40,6 +40,8 @@ export const connectSingletonDatabase = (): Promise<typeof mongoose> => {
   return mongoose
     .connect(connectionString, {
       useNewUrlParser: true,
+      useFindAndModify: false,
+      useCreateIndex: true,
       useUnifiedTopology: true,
     })
     .catch(error => {

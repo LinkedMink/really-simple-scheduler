@@ -1,4 +1,4 @@
-import { StringSerializer } from "@linkedmink/multilevel-aging-cache";
+import { ISerializer, StringSerializer } from "@linkedmink/multilevel-aging-cache";
 import {
   RedisPubSubStorageProvider,
   IRedisStorageProviderOptions,
@@ -6,8 +6,6 @@ import {
 import Redis from "ioredis";
 
 import { config } from "./Config";
-import { JobSerializer } from "../models/JobSerializer";
-import { IJob } from "../models/JobInterfaces";
 import { ConfigKey } from "./ConfigKey";
 
 export enum RedisMode {
@@ -40,27 +38,20 @@ const createRedisClient = (): Redis.Redis | Redis.Cluster => {
     const hostArray = config.getJson<IHostPort[]>(ConfigKey.RedisHosts);
     return new Redis.Cluster(hostArray);
   } else {
-    throw Error(
-      `Unsupported RedisMode: ${stringMode}; Can be Single, Sentinel, or Cluster`
-    );
+    throw Error(`Unsupported RedisMode: ${stringMode}; Can be Single, Sentinel, or Cluster`);
   }
 };
 
-export const createRedisStorageProvider = (): RedisPubSubStorageProvider<
-  string,
-  IJob
-> => {
+export const createRedisStorageProvider = <T>(
+  serializer: ISerializer<T>
+): RedisPubSubStorageProvider<string, T> => {
   const redisClient = createRedisClient();
   const redisChannel = createRedisClient();
   const redisOptions = {
     keyPrefix: config.getString(ConfigKey.RedisKeyPrefix),
     keySerializer: new StringSerializer(),
-    valueSerializer: new JobSerializer(),
-  } as IRedisStorageProviderOptions<string, IJob>;
+    valueSerializer: serializer,
+  } as IRedisStorageProviderOptions<string, T>;
 
-  return new RedisPubSubStorageProvider(
-    redisClient,
-    redisOptions,
-    redisChannel
-  );
+  return new RedisPubSubStorageProvider(redisClient, redisOptions, redisChannel);
 };

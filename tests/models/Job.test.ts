@@ -11,7 +11,7 @@ class MockJobWork implements IJobWork {
 describe(path.basename(__filename, ".test.ts"), () => {
   beforeAll(() => {
     setGlobalMockTransport();
-  })
+  });
 
   test("should return job object in ready state", () => {
     // Arrange

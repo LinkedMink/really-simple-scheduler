@@ -6,10 +6,10 @@ import { setGlobalMockTransport } from "../mocks/MockTransport";
 
 describe(path.basename(__filename, ".test.ts"), () => {
   let connectFunction = mongoose.connect;
-  
+
   beforeAll(() => {
     setGlobalMockTransport();
-  })
+  });
 
   beforeEach(() => {
     // Clear all instances and calls to constructor and all methods:

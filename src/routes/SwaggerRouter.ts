@@ -7,9 +7,12 @@ export const getSwaggerRouter = async (): Promise<Router> => {
 
   const swaggerRouter = Router();
   swaggerRouter.use("/", swaggerUi.serve);
-  swaggerRouter.get("/", swaggerUi.setup(swaggerDoc, {
-    isExplorer: true,
-  }))
+  swaggerRouter.get(
+    "/",
+    swaggerUi.setup(swaggerDoc, {
+      isExplorer: true,
+    })
+  );
 
-  return swaggerRouter;  
-}
+  return swaggerRouter;
+};

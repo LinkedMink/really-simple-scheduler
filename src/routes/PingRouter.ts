@@ -23,15 +23,18 @@ export const pingRouter = Router();
  */
 pingRouter.get("/", (req: Request, res: Response) => {
   if (config.isEnvironmentProd) {
-    res.send(response.success<IPingMark>({
-      mark: Date.now()
-    }));
-
+    res.send(
+      response.success<IPingMark>({
+        mark: Date.now(),
+      })
+    );
   } else {
-    res.send(response.success<IPingMark>({
-      mark: Date.now(),
-      application: config.packageJson.name,
-      version: config.packageJson.version,
-    }));
+    res.send(
+      response.success<IPingMark>({
+        mark: Date.now(),
+        application: config.packageJson.name,
+        version: config.packageJson.version,
+      })
+    );
   }
 });

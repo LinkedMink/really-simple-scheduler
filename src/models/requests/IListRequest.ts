@@ -1,12 +1,9 @@
-import {
-  ObjectAttribute,
-  ObjectDescriptor,
-} from "../../infastructure/ObjectDescriptor";
+import { ObjectAttribute, ObjectDescriptor } from "../../infastructure/ObjectDescriptor";
 import { Document, FilterQuery } from "mongoose";
 
 export enum SortOrder {
-  Descending = 'dsc',
-  Ascending = 'asc',
+  Descending = "dsc",
+  Ascending = "asc",
 }
 
 /**
@@ -69,9 +66,7 @@ export interface IListRequest<T> {
   query?: FilterQuery<T>;
 }
 
-export const searchRequestDescriptor = new ObjectDescriptor<
-IListRequest<Document<unknown>>
->(
+export const searchRequestDescriptor = new ObjectDescriptor<IListRequest<Document<unknown>>>(
   {
     pageSize: [
       {
@@ -95,10 +90,15 @@ IListRequest<Document<unknown>>
       toSanitize.pageNumber = Number(toSanitize.pageNumber);
     }
     if (toSanitize.sort) {
-      toSanitize.sort = JSON.parse((toSanitize.sort as unknown) as string) as Record<string, SortOrder>;
+      toSanitize.sort = JSON.parse((toSanitize.sort as unknown) as string) as Record<
+        string,
+        SortOrder
+      >;
     }
     if (toSanitize.query) {
-      toSanitize.query = JSON.parse((toSanitize.query as unknown) as string) as FilterQuery<unknown>;
+      toSanitize.query = JSON.parse(
+        (toSanitize.query as unknown) as string
+      ) as FilterQuery<unknown>;
     }
     return toSanitize;
   }

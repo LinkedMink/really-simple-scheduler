@@ -1,0 +1,33 @@
+TaskTypes:
+- name: ArticleLinkScan
+  description: 'Scan a Wikipedia for links between articles'
+  permissions:
+    baseClaimName: ArticleLinkScan
+  isProgressReported: true
+  isSuspendable: true
+  isCancelable: true
+  keepInactiveForMinutes: 240
+  parameterSchema:
+    type: object
+    properties:
+      id:
+        type: string
+        required: true
+      depth:
+        type: integer
+        format: int64
+    required:
+      - id
+- name: CleanStaleTask
+  description: 'Archive tasks that can no longer be run and with results that are no longer valid'
+  permissions:
+    readClaim: SystemMaintenance
+    scheduleClaim: SystemMaintenance
+    manageClaim: SystemMaintenance
+  isProgressReported: false
+  isSuspendable: false
+  isCancelable: false
+  keepInactiveForMinutes: 30
+  parameterSchema:
+    type: string
+    description: 'The task type to clear'

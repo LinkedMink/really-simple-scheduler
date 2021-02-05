@@ -12,11 +12,11 @@ const getDefaultFormat = () => {
     format.timestamp(),
     format.printf(info => {
       const label = info.label ? ` ${info.label}` : "";
-      const message = info.stack ? info.stack as string : info.message;
+      const message = info.stack ? (info.stack as string) : info.message;
       return `${info.timestamp} ${info.level}${label}: ${message}`;
-    }),
+    })
   );
-}
+};
 
 /**
  * Expose the logger options, so that output can be customized

@@ -1,12 +1,8 @@
-import {
-  NextFunction,
-  Request,
-  Response,
-} from "express";
+import { NextFunction, Request, Response } from "express";
 import passport from "passport";
 
 import { response } from "../models/responses/IResponseData";
-import { IUserEntityModel } from "../models/IUserEntityModel";
+import { IUserEntityModel } from "../models/responses/IUserEntityModel";
 import { IJwtPayload } from "./Passport";
 import { isError, isString } from "../infastructure/TypeCheck";
 
@@ -18,14 +14,11 @@ const getClaimMissingError = (claim: string[]): string => {
 };
 
 export enum AuthorizationClaim {
-  TaskManage = "TaskManage",
+  TaskTypeRead = "TaskTypeRead",
+  TaskTypeWrite = "TaskTypeWrite",
 }
 
-export const authorizeUserOwned = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
+export const authorizeUserOwned = (req: Request, res: Response, next: NextFunction): void => {
   const jwt = req.user as IJwtPayload;
   const model = req.body as IUserEntityModel;
 
@@ -40,11 +33,8 @@ export const authorizeUserOwned = (
 };
 
 export const authorizeJwtClaim = (claimNames?: string[]) => {
-  return (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): void => {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     passport.authenticate(
       JWT_STRATEGY,
       { session: false },
@@ -71,9 +61,7 @@ export const authorizeJwtClaim = (claimNames?: string[]) => {
         let missingClaims = claimNames.slice();
         if (payload.claims) {
           missingClaims = missingClaims.filter(claimName => {
-            const foundClaim = payload.claims.find(
-              claim => claim === claimName
-            );
+            const foundClaim = payload.claims.find(claim => claim === claimName);
             if (foundClaim) {
               return false;
             } else {

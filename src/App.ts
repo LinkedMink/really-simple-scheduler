@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import bodyParser from "body-parser";
 import express from "express";
 import expressWs from "express-ws";
@@ -12,6 +14,9 @@ import { errorMiddleware } from "./middleware/Error";
 import { logRequestMiddleware } from "./middleware/LogRequest";
 import { addJwtStrategy } from "./middleware/Passport";
 import { pingRouter } from "./routes/PingRouter";
+import { taskScheduleRouter } from "./routes/TaskScheduleRouter";
+import { taskQueueRouter } from "./routes/TaskQueueRouter";
+import { taskTypeRouter } from "./routes/TaskTypeRouter";
 import { getSwaggerRouter } from "./routes/SwaggerRouter";
 
 initializeLogger();
@@ -30,15 +35,18 @@ app.use(corsMiddleware);
 app.use(errorMiddleware);
 
 app.use("/", pingRouter);
+app.use("/task/schedule", taskScheduleRouter);
+app.use("/task/queue", taskQueueRouter);
+app.use("/task-type", taskTypeRouter);
 
 void getSwaggerRouter()
   .then(router => {
     app.use("/docs", router);
-    Logger.get().info("Swagger Doc Loaded: /docs")
+    Logger.get().info("Swagger Doc Loaded: /docs");
   })
   .catch(error => {
-    Logger.get().info("Swagger Disabled")
-    Logger.get().verbose(error)
+    Logger.get().info("Swagger Disabled");
+    Logger.get().verbose(error);
   });
 
 const listenPort = config.getNumber(ConfigKey.ListenPort);

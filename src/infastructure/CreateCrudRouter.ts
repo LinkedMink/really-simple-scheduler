@@ -4,21 +4,18 @@ import { Document, Model, FilterQuery, Query, UpdateQuery } from "mongoose";
 
 import { authorizeJwtClaim } from "../middleware/Authorization";
 import { IJwtPayload } from "../middleware/Passport";
-import { IModelConverter } from "../models/mappers/IModelMapper";
+import { IModelMapper } from "../models/mappers/IModelMapper";
 import { response } from "../models/responses/IResponseData";
-import {
-  IListRequest,
-  searchRequestDescriptor,
-} from "../models/requests/IListRequest";
+import { IListRequest, searchRequestDescriptor } from "../models/requests/IListRequest";
 import { objectDescriptorBodyVerify } from "./ObjectDescriptor";
 
 const DEFAULT_ITEMS_PER_PAGE = 20;
 
 export type GetFilterFunction<T> = (user: IJwtPayload) => FilterQuery<T>;
 
-export const filterByUserId: GetFilterFunction<Document> = (
-  user: IJwtPayload
-) => ({ userId: user.sub });
+export const filterByUserId: GetFilterFunction<Document> = (user: IJwtPayload) => ({
+  userId: user.sub,
+});
 
 /**
  * @swagger
@@ -131,12 +128,9 @@ export const filterByUserId: GetFilterFunction<Document> = (
  *       404:
  *         $ref: '#/components/responses/404NotFound'
  */
-export const createCrudRouter = <
-  TFrontend extends object,
-  TBackend extends Document<TBackend>
->(
+export const createCrudRouter = <TFrontend, TBackend extends Document<unknown>>(
   model: Model<TBackend>,
-  modelConverter: IModelConverter<TFrontend, TBackend>,
+  modelConverter: IModelMapper<TFrontend, TBackend>,
   requiredClaimRead?: string,
   requiredClaimWrite?: string,
   authorizeWriteHandler?: RequestHandler,
@@ -187,9 +181,7 @@ export const createCrudRouter = <
       }
 
       if (isPagingMandatory || reqData.pageSize || reqData.pageNumber) {
-        const itemsPerPage = reqData.pageSize
-          ? reqData.pageSize
-          : DEFAULT_ITEMS_PER_PAGE;
+        const itemsPerPage = reqData.pageSize ? reqData.pageSize : DEFAULT_ITEMS_PER_PAGE;
         query = query.limit(itemsPerPage);
 
         if (reqData.pageNumber) {
@@ -212,10 +204,7 @@ export const createCrudRouter = <
 
       let query: Query<TBackend | null, TBackend>;
       if (getFilterFunc) {
-        const conditions = Object.assign(
-          { id: entityId },
-          getFilterFunc(req.user as IJwtPayload)
-        );
+        const conditions = Object.assign({ id: entityId }, getFilterFunc(req.user as IJwtPayload));
         query = model.findOne(conditions);
       } else {
         query = model.findById(entityId);
@@ -223,9 +212,7 @@ export const createCrudRouter = <
 
       const entity = await query.exec();
       if (entity) {
-        res.send(response.success(
-          modelConverter.convertToFrontend(entity)
-        ));
+        res.send(response.success(modelConverter.convertToFrontend(entity)));
       } else {
         res.status(404);
         res.send(response.failed(`Failed to find ID: ${entityId}`));
@@ -234,75 +221,55 @@ export const createCrudRouter = <
   ];
 
   const addEntityHandlers: RequestHandler[] = [
-    async (req: Request<ParamsDictionary>, res: Response): Promise<void> => {
+    async (req: Request<ParamsDictionary>, res: Response): Promise<Response> => {
       const userId = (req.user as IJwtPayload).sub;
-      const toSave = modelConverter.convertToBackend(
-        req.body,
-        undefined,
-        `User(${userId})`
-      );
+      const toSave = modelConverter.convertToBackend(req.body, undefined, `User(${userId})`);
+
       const saveModel = new model(toSave);
-      await saveModel.save(error => {
-        if (error) {
-          let message = error.message;
 
+      return saveModel
+        .save()
+        .then(saved => {
+          if (saved !== saveModel) {
+            res.status(400);
+            return res.send(response.failed(saved));
+          }
+
+          return res.send(response.success(modelConverter.convertToFrontend(saved)));
+        })
+        .catch(e => {
           res.status(400);
-          return res.send(response.failed(message));
-        }
-
-        return res.send(response.success(
-          modelConverter.convertToFrontend(saveModel)
-        ));
-      });
+          return res.send(response.failed(e));
+        });
     },
   ];
 
   const updateEntityHandlers: RequestHandler[] = [
-    async (req: Request<ParamsDictionary>, res: Response): Promise<void> => {
+    async (req: Request<ParamsDictionary>, res: Response): Promise<Response> => {
       const entityId = req.params.entityId;
       const toUpdate = await model.findById(entityId).exec();
       if (toUpdate === null) {
         res.status(404);
-        res.send(response.failed(`Failed to find ID: ${entityId}`));
-        return;
+        return res.send(response.failed(`Failed to find ID: ${entityId}`));
       }
 
       const userId = (req.user as IJwtPayload).sub;
-      const updateModel = modelConverter.convertToBackend(
-        req.body,
-        toUpdate,
-        `User(${userId})`
-      );
+      const updateModel = modelConverter.convertToBackend(req.body, toUpdate, `User(${userId})`);
 
-      return new Promise((resolve, reject) => {
-        updateModel.validate((error: unknown) => {
-          if (error) {
+      return updateModel
+        .save()
+        .then(saved => {
+          if (saved !== updateModel) {
             res.status(400);
-            res.send(response.failed(error as string));
-            resolve();
+            return res.send(response.failed(saved));
           }
 
-          model
-            .findByIdAndUpdate(
-              entityId,
-              (updateModel as unknown) as UpdateQuery<TBackend>,
-              null,
-              (updateError: unknown) => {
-                if (!updateError) {
-                  res.send(response.success(
-                    modelConverter.convertToFrontend(updateModel)
-                  ));
-                  resolve();
-                } else {
-                  res.status(500);
-                  res.send(response.failed((updateError as Error).message));
-                  resolve();
-                }
-              }
-            )
-            .exec();
+          return res.send(response.success(modelConverter.convertToFrontend(saved)));
+        })
+        .catch(e => {
+          res.status(400);
+          return res.send(response.failed(e));
         });
-      });
     },
   ];
 
@@ -312,10 +279,7 @@ export const createCrudRouter = <
 
       let query: Query<TBackend | null, TBackend>;
       if (getFilterFunc) {
-        const conditions = Object.assign(
-          { id: entityId },
-          getFilterFunc(req.user as IJwtPayload)
-        );
+        const conditions = Object.assign({ id: entityId }, getFilterFunc(req.user as IJwtPayload));
         query = model.findOneAndDelete(conditions);
       } else {
         query = model.findByIdAndDelete(entityId);

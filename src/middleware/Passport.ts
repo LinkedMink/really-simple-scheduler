@@ -1,6 +1,11 @@
 import { Request } from "express";
 import { PassportStatic } from "passport";
-import { ExtractJwt, Strategy as JwtStrategy, StrategyOptions as JwtStrategyOptions, VerifiedCallback } from "passport-jwt";
+import {
+  ExtractJwt,
+  Strategy as JwtStrategy,
+  StrategyOptions as JwtStrategyOptions,
+  VerifiedCallback,
+} from "passport-jwt";
 
 import { config } from "../infastructure/Config";
 import { ConfigKey } from "../infastructure/ConfigKey";
@@ -25,12 +30,14 @@ export const addJwtStrategy = (passport: PassportStatic): void => {
     passReqToCallback: true,
   };
 
-  passport.use(new JwtStrategy(options, (req: Request, jwtPayload: IJwtPayload, done: VerifiedCallback) => {
-    if (jwtPayload.exp && Date.now() / 1000 > jwtPayload.exp) {
-      return done("JWT Expired");
-    }
+  passport.use(
+    new JwtStrategy(options, (req: Request, jwtPayload: IJwtPayload, done: VerifiedCallback) => {
+      if (jwtPayload.exp && Date.now() / 1000 > jwtPayload.exp) {
+        return done("JWT Expired");
+      }
 
-    req.user = jwtPayload;
-    return done(null, jwtPayload);
-  }));
+      req.user = jwtPayload;
+      return done(null, jwtPayload);
+    })
+  );
 };
