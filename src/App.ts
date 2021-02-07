@@ -10,14 +10,14 @@ import { ConfigKey } from "./infastructure/ConfigKey";
 import { connectSingletonDatabase } from "./infastructure/Database";
 import { initializeLogger, Logger } from "./infastructure/Logger";
 import { corsMiddleware } from "./middleware/Cors";
-import { errorMiddleware } from "./middleware/Error";
+import { getErrorMiddleware } from "./middleware/Error";
 import { logRequestMiddleware } from "./middleware/LogRequest";
 import { addJwtStrategy } from "./middleware/Passport";
+import { getOpenApiRouter } from "./routes/OpenApiRouter";
 import { pingRouter } from "./routes/PingRouter";
-import { taskScheduleRouter } from "./routes/TaskScheduleRouter";
-import { taskQueueRouter } from "./routes/TaskQueueRouter";
+import { getTaskScheduleRouter } from "./routes/TaskScheduleRouter";
+import { getTaskQueueRouter } from "./routes/TaskQueueRouter";
 import { taskTypeRouter } from "./routes/TaskTypeRouter";
-import { getSwaggerRouter } from "./routes/SwaggerRouter";
 
 initializeLogger();
 void connectSingletonDatabase();
@@ -32,21 +32,26 @@ addJwtStrategy(passport);
 app.use(passport.initialize());
 
 app.use(corsMiddleware);
-app.use(errorMiddleware);
 
 app.use("/", pingRouter);
-app.use("/task/schedule", taskScheduleRouter);
-app.use("/task/queue", taskQueueRouter);
 app.use("/task-type", taskTypeRouter);
 
-void getSwaggerRouter()
+void getTaskQueueRouter().then(rQueue => {
+  app.use("/task/queue", rQueue);
+  void getTaskScheduleRouter().then(rSchedule => {
+    app.use("/task/schedule", rSchedule);
+    app.use(getErrorMiddleware());
+  });
+});
+
+void getOpenApiRouter()
   .then(router => {
     app.use("/docs", router);
-    Logger.get().info("Swagger Doc Loaded: /docs");
+    Logger.get().info("Swagger UI Path: /docs");
   })
   .catch(error => {
     Logger.get().info("Swagger Disabled");
-    Logger.get().verbose(error);
+    Logger.get().verbose({ message: error as Error });
   });
 
 const listenPort = config.getNumber(ConfigKey.ListenPort);

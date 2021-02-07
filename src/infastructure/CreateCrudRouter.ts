@@ -1,13 +1,11 @@
-import { RequestHandler, Router } from "express";
-import { ParamsDictionary, Request, Response } from "express-serve-static-core";
-import { Document, Model, FilterQuery, Query, UpdateQuery } from "mongoose";
+import { RequestHandler, Router, Request, Response } from "express";
+import { Document, Model, FilterQuery, Query } from "mongoose";
 
 import { authorizeJwtClaim } from "../middleware/Authorization";
 import { IJwtPayload } from "../middleware/Passport";
 import { IModelMapper } from "../models/mappers/IModelMapper";
 import { response } from "../models/responses/IResponseData";
-import { IListRequest, searchRequestDescriptor } from "../models/requests/IListRequest";
-import { objectDescriptorBodyVerify } from "./ObjectDescriptor";
+import { IListRequest } from "../models/requests/IListRequest";
 
 const DEFAULT_ITEMS_PER_PAGE = 20;
 
@@ -140,8 +138,7 @@ export const createCrudRouter = <TFrontend, TBackend extends Document<unknown>>(
   const router = Router();
 
   const getEntityListHandlers: RequestHandler[] = [
-    objectDescriptorBodyVerify(searchRequestDescriptor, false),
-    async (req: Request<ParamsDictionary>, res: Response): Promise<void> => {
+    async (req: Request, res: Response): Promise<void> => {
       const reqData = req.query as IListRequest<TBackend>;
 
       let query: Query<TBackend[], TBackend>;
@@ -199,7 +196,7 @@ export const createCrudRouter = <TFrontend, TBackend extends Document<unknown>>(
   ];
 
   const getEntityHandlers: RequestHandler[] = [
-    async (req: Request<ParamsDictionary>, res: Response): Promise<void> => {
+    async (req: Request, res: Response): Promise<void> => {
       const entityId = req.params.entityId;
 
       let query: Query<TBackend | null, TBackend>;
@@ -221,7 +218,7 @@ export const createCrudRouter = <TFrontend, TBackend extends Document<unknown>>(
   ];
 
   const addEntityHandlers: RequestHandler[] = [
-    async (req: Request<ParamsDictionary>, res: Response): Promise<Response> => {
+    async (req: Request, res: Response): Promise<Response> => {
       const userId = (req.user as IJwtPayload).sub;
       const toSave = modelConverter.convertToBackend(req.body, undefined, `User(${userId})`);
 
@@ -245,7 +242,7 @@ export const createCrudRouter = <TFrontend, TBackend extends Document<unknown>>(
   ];
 
   const updateEntityHandlers: RequestHandler[] = [
-    async (req: Request<ParamsDictionary>, res: Response): Promise<Response> => {
+    async (req: Request, res: Response): Promise<Response> => {
       const entityId = req.params.entityId;
       const toUpdate = await model.findById(entityId).exec();
       if (toUpdate === null) {
@@ -274,7 +271,7 @@ export const createCrudRouter = <TFrontend, TBackend extends Document<unknown>>(
   ];
 
   const deleteEntityHandlers: RequestHandler[] = [
-    async (req: Request<ParamsDictionary>, res: Response): Promise<void> => {
+    async (req: Request, res: Response): Promise<void> => {
       const entityId = req.params.entityId;
 
       let query: Query<TBackend | null, TBackend>;

@@ -31,9 +31,7 @@ export const executeOnExit = (handler = NoOpHandler): void => {
 
   process.on("uncaughtException", function (e) {
     logger.error("Uncaught Exception...");
-    if (e.stack) {
-      logger.error(e.stack);
-    }
+    logger.error({ message: e });
 
     process.exit(1);
   });

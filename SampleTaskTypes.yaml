@@ -12,12 +12,11 @@ TaskTypes:
     properties:
       id:
         type: string
-        required: true
       depth:
         type: integer
         format: int64
     required:
-      - id
+    - id
 - name: CleanStaleTask
   description: 'Archive tasks that can no longer be run and with results that are no longer valid'
   permissions:
@@ -31,3 +30,6 @@ TaskTypes:
   parameterSchema:
     type: string
     description: 'The task type to clear'
+  resultSchema:
+    type: integer
+    description: 'The number of items archived'

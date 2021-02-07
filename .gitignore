@@ -26,4 +26,5 @@ yarn-error.log*
 
 *.key*
 
-swagger.json
+/docs/OpenApi.json
+/docs/TaskTypeParamsResults.yaml

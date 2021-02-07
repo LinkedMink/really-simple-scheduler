@@ -1,10 +1,34 @@
 import { SchemaTypes, Schema, model } from "mongoose";
+import { openapiV2 } from "@apidevtools/openapi-schemas";
+import { OpenAPIV3 } from "openapi-types";
+import ZSchema from "z-schema";
 import { IPermissionClaim, permissionClaim } from "./PermissionClaim";
 import {
   ITrackedEntity,
   trackedEntityPreValidateFunc,
   trackedEntitySchemaDefinition,
 } from "./TrackedEntity";
+
+const schemaValidator = new ZSchema({});
+const validateOpenApiSchema = () => {
+  return {
+    validator: function (value?: string) {
+      return (
+        !value ||
+        schemaValidator.validate(
+          value,
+          openapiV2,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          { schemaPath: "definitions.schema" } as any
+        )
+      );
+    },
+    message: (props: Record<string, unknown>) => {
+      const error = schemaValidator.getLastError();
+      return `Not a valid OpenAPI schema: ${error.message}, ${error.stack}`;
+    },
+  };
+};
 
 const taskTypeSchemaDefinition = Object.assign({}, trackedEntitySchemaDefinition, {
   name: {
@@ -35,13 +59,18 @@ const taskTypeSchemaDefinition = Object.assign({}, trackedEntitySchemaDefinition
   },
   parameterSchema: {
     type: SchemaTypes.Mixed,
+    validate: validateOpenApiSchema(),
+  },
+  resultSchema: {
+    type: SchemaTypes.Mixed,
+    validate: validateOpenApiSchema(),
   },
 });
 
 export const taskTypeSchema = new Schema(taskTypeSchemaDefinition);
 taskTypeSchema.pre("validate", trackedEntityPreValidateFunc);
 
-export interface ITaskType<TParams = unknown> extends ITrackedEntity {
+export interface ITaskType extends ITrackedEntity {
   name: string;
   description?: string;
   permissions?: IPermissionClaim;
@@ -49,7 +78,8 @@ export interface ITaskType<TParams = unknown> extends ITrackedEntity {
   isSuspendable: boolean;
   isCancelable: boolean;
   keepInactiveForMinutes: number;
-  parameterSchema: TParams;
+  parameterSchema?: OpenAPIV3.SchemaObject;
+  resultSchema?: OpenAPIV3.SchemaObject;
 }
 
 export const TaskType = model<ITaskType>("Task-Type", taskTypeSchema);

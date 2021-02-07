@@ -17,6 +17,7 @@ export class TaskTypeMapper implements IModelMapper<ITaskTypeModel, ITaskType> {
       isCancelable: model.isCancelable,
       keepInactiveForMinutes: model.keepInactiveForMinutes,
       parameterSchema: model.parameterSchema,
+      resultSchema: model.resultSchema,
     };
 
     returnModel = mapTrackedEntity(model, returnModel);
@@ -42,7 +43,8 @@ export class TaskTypeMapper implements IModelMapper<ITaskTypeModel, ITaskType> {
       (returnModel.isSuspendable = model.isSuspendable),
       (returnModel.isCancelable = model.isCancelable),
       (returnModel.keepInactiveForMinutes = model.keepInactiveForMinutes),
-      (returnModel.parameterSchema = model.parameterSchema);
+      (returnModel.parameterSchema = model.parameterSchema),
+      (returnModel.resultSchema = model.resultSchema);
 
     return new this.dbModel(returnModel);
   };

@@ -12,6 +12,26 @@ components:
       schema:
         type: string
         format: object-id
+  schemas:
+    ValidationError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            data:
+              type: array
+              items:
+                type: object
+          required:
+            - name
+            - message
+      required:
+        - error
   responses:
     200Null:
       description: The request was successful
@@ -21,6 +41,26 @@ components:
             $ref: "#/components/schemas/ObjectResponse"
     400BadRequest:
       description: The supplied parameters are invalid
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    400ModelValidation:
+      description: The supplied parameters are invalid
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+    401Auth:
+      description: The user could not be authenticated
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    403Forbidden:
+      description: The supplied user does not have permission to perform this action
       content:
         application/json:
           schema:

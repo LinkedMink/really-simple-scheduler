@@ -10,6 +10,8 @@ import {
 import { config } from "../infastructure/Config";
 import { ConfigKey } from "../infastructure/ConfigKey";
 
+export const PASSPORT_JWT_STRATEGY = "jwt";
+
 export interface IJwtPayload {
   aud: string;
   claims: string[];
@@ -18,6 +20,11 @@ export interface IJwtPayload {
   iat: number;
   iss: string;
   sub: string;
+}
+
+export interface IUserSession extends Omit<IJwtPayload, "claims"> {
+  claims: Set<string>;
+  record?: Record<string, unknown>;
 }
 
 export const addJwtStrategy = (passport: PassportStatic): void => {
@@ -31,13 +38,19 @@ export const addJwtStrategy = (passport: PassportStatic): void => {
   };
 
   passport.use(
+    PASSPORT_JWT_STRATEGY,
     new JwtStrategy(options, (req: Request, jwtPayload: IJwtPayload, done: VerifiedCallback) => {
       if (jwtPayload.exp && Date.now() / 1000 > jwtPayload.exp) {
         return done("JWT Expired");
       }
 
-      req.user = jwtPayload;
-      return done(null, jwtPayload);
+      const userSession: IUserSession = {
+        ...jwtPayload,
+        claims: new Set(jwtPayload.claims),
+      };
+
+      req.user = userSession;
+      return done(null, userSession);
     })
   );
 };
