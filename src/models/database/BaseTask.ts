@@ -3,12 +3,6 @@ import { ITaskType, TaskType, taskTypeSchema } from "./TaskType";
 import { IUserEntity, userEntitySchemaDefinition } from "./UserEntity";
 
 export const baseTaskSchemaDefinition = Object.assign({}, userEntitySchemaDefinition, {
-  taskTypeId: {
-    type: SchemaTypes.ObjectId,
-    ref: TaskType.name,
-    index: true,
-    required: true,
-  },
   taskType: taskTypeSchema,
   startDateTime: {
     type: SchemaTypes.Date,

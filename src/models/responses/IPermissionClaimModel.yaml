@@ -1,0 +1,21 @@
+components:
+  schemas:
+    IPermissionClaimModel:
+      type: object
+      properties:
+        baseClaimName:
+          type: string
+          pattern: '[a-zA-Z]+'
+          nullable: true
+        readClaim:
+          type: string
+          pattern: '[a-zA-Z]+'
+          nullable: true
+        scheduleClaim:
+          type: string
+          pattern: '[a-zA-Z]+'
+          nullable: true
+        manageClaim:
+          type: string
+          pattern: '[a-zA-Z]+'
+          nullable: true

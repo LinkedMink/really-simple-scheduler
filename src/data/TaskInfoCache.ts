@@ -1,5 +1,6 @@
 import { Logger } from "../infastructure/Logger";
-import { IPermissionClaim, ITaskType, TaskType } from "../models/database";
+import { ITaskType, TaskType } from "../models/database/TaskType";
+import { IPermissionClaim } from "../models/database/PermissionClaim";
 import {
   AgingCacheWriteMode,
   AgingCacheReplacementPolicy,
@@ -26,13 +27,19 @@ export class TaskInfoCache {
   private readonly logger = Logger.get(TaskInfoCache.name);
   private _permissionMap = new Map<string, string>();
   private _taskTypeMap = new Map<string, ITaskType>();
+  private _isInitialized = false;
 
-  static get(): TaskInfoCache {
+  get isInitialized(): boolean {
+    return this._isInitialized;
+  }
+
+  static async get(): Promise<TaskInfoCache> {
     if (TaskInfoCache.instance) {
       return TaskInfoCache.instance;
     }
 
     TaskInfoCache.instance = new TaskInfoCache();
+    await TaskInfoCache.instance.load();
     return TaskInfoCache.instance;
   }
 
@@ -48,6 +55,8 @@ export class TaskInfoCache {
       this._taskTypeMap.set(t.name, t);
       setPermissionMap(this._permissionMap, t.name, t.permissions as IPermissionClaim);
     });
+
+    this._isInitialized = true;
 
     this.logger.verbose(`Loading ${TaskType.name} End`);
   }

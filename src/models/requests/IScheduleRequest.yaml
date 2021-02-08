@@ -1,0 +1,11 @@
+components:
+  schemas:
+    IScheduleRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          pattern: '\w+'
+        parameters:
+          type: object
+          nullable: true

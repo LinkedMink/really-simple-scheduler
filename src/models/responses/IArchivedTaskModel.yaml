@@ -1,0 +1,22 @@
+components:
+  schemas:
+    ArchivedTaskStatus:
+      type: string
+      enum:
+      - faulted
+      - complete
+      - canceled
+    IArchivedTaskModel:
+      allOf:
+      - $ref: '#/components/schemas/IBaseTaskModel'
+      - type: object
+        properties:
+          status:
+            $ref: '#/components/schemas/ArchivedTaskStatus'
+    ArchivedTaskModelResponse:
+      allOf:
+      - $ref: '#/components/schemas/IResponseData'
+      - type: object
+        properties:
+          data:
+            $ref: '#/components/schemas/IArchivedTaskModel'

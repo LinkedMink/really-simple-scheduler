@@ -1,0 +1,86 @@
+paths:
+  /task/schedule/search:
+    get:
+      tags: [Task Schedule]
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/listPageSize'
+        - $ref: '#/components/parameters/listPageNumber'
+        - $ref: '#/components/parameters/listSort'
+        - $ref: '#/components/parameters/listQuery'
+      responses:
+        200:
+          description: The retrieved Task list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskModelResponse'
+        400:
+          $ref: '#/components/responses/400BadRequest'
+  /task/schedule/:
+    get:
+      tags: [Task Schedule]
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: The active tasks that the user owns
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskModelResponse'
+    post:
+      description: Queue a new Task to be processed
+      tags: [Task Schedule]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IScheduleRequest'
+      responses:
+        202:
+          description: The scheduled Task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskModelResponse'
+        400:
+          $ref: '#/components/responses/400ModelValidation'
+  /task/schedule/{id}:
+    get:
+      tags: [Task Schedule]
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ObjectId'
+      responses:
+        200:
+          description: The retrieved Task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskModelResponse'
+        404:
+          $ref: '#/components/responses/404NotFound'
+    delete:
+      description: Attempt to cancel a Task in progress
+      tags: [Task Schedule]
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ObjectId'
+      responses:
+        202:
+          $ref: '#/components/responses/200Null'
+        400:
+          $ref: '#/components/responses/400BadRequest'
+        404:
+          $ref: '#/components/responses/404NotFound'

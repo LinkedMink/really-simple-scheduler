@@ -1,0 +1,31 @@
+components:
+  schemas:
+    TaskStatus:
+      type: string
+      enum:
+      - ready
+      - running
+      - suspended
+      - faulted
+      - complete
+      - canceled
+    ITaskModel:
+      allOf:
+      - $ref: '#/components/schemas/IUserEntityModel'
+      - type: object
+        properties:
+          status:
+            $ref: '#/components/schemas/TaskStatus'
+          progress:
+            $ref: '#/components/schemas/IProgressModel'
+            nullable: true
+          state:
+            type: object
+            nullable: true
+    TaskModelResponse:
+      allOf:
+      - $ref: '#/components/schemas/IResponseData'
+      - type: object
+        properties:
+          data:
+            $ref: '#/components/schemas/ITaskModel'

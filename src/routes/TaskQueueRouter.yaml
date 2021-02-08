@@ -1,0 +1,112 @@
+components:
+  parameters:
+    TypeName:
+      in: path
+      name: typeName
+      required: true
+      schema:
+        type: string
+        pattern: '\w+'
+paths:
+  /task/queue/{typeName}:
+    get:
+      description: Get the next task in the queue for the specified type
+      tags: [Task Queue]
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TypeName'
+      responses:
+        200:
+          description: The retrieved Task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskModelResponse'
+        404:
+          $ref: '#/components/responses/404NotFound'
+  /task/queue/{typeName}/{id}:
+    patch:
+      description: Update the progress of a task
+      tags: [Task Queue]
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TypeName'
+        - $ref: '#/components/parameters/ObjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IProgressModel'
+      responses:
+        200:
+          $ref: '#/components/responses/200Null'
+        400:
+          $ref: '#/components/responses/400ModelValidation'
+        404:
+          $ref: '#/components/responses/404NotFound'
+    put:
+      description: Set the Task as suspended to be requeued
+      tags: [Task Queue]
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TypeName'
+        - $ref: '#/components/parameters/ObjectId'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/200Null'
+        400:
+          $ref: '#/components/responses/400ModelValidation'
+        404:
+          $ref: '#/components/responses/404NotFound'
+    delete:
+      description: Set the Task as faulted and post reason
+      tags: [Task Queue]
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TypeName'
+        - $ref: '#/components/parameters/ObjectId'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/200Null'
+        400:
+          $ref: '#/components/responses/400ModelValidation'
+        404:
+          $ref: '#/components/responses/404NotFound'
+    post:
+      description: Set the Task and complete and post results
+      tags: [Task Queue]
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TypeName'
+        - $ref: '#/components/parameters/ObjectId'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/200Null'
+        400:
+          $ref: '#/components/responses/400ModelValidation'
+        404:
+          $ref: '#/components/responses/404NotFound'

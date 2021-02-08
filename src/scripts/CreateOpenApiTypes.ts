@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 
+import { openapiV3 as OpenApiSchema } from "@apidevtools/openapi-schemas";
 import fs from "fs";
 import { OpenAPIV3 } from "openapi-types";
 import yaml from "yaml";
-import { TaskType } from "../models/database";
+import { TaskType } from "../models/database/TaskType";
 import { initializeLogger, Logger } from "../infastructure/Logger";
 import { connectSingletonDatabase } from "../infastructure/Database";
 
@@ -22,7 +23,9 @@ const main = async () => {
 
   const doc = {
     components: {
-      schemas: {} as Record<string, OpenAPIV3.SchemaObject>,
+      schemas: {
+        OpenApiSchemaObject: OpenApiSchema.definitions?.Schema,
+      } as Record<string, OpenAPIV3.SchemaObject>,
     },
   };
 

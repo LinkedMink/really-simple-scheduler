@@ -1,26 +1,20 @@
 import { Router } from "express";
+import { TaskScheduleController } from "../controllers/TaskScheduleController";
 import { TaskInfoCache } from "../data/TaskInfoCache";
 
-export const getTaskScheduleRouter = async (): Promise<Router> => {
+export const getTaskScheduleRouter = (taskInfo: TaskInfoCache): Router => {
   const taskScheduleRouter = Router();
+  const controller = new TaskScheduleController(taskInfo);
 
-  const taskInfo = TaskInfoCache.get();
-  await taskInfo.load();
+  taskScheduleRouter.get("/search", [controller.searchHandler]);
 
-  // Search active task
-  taskScheduleRouter.get("/list", []);
+  taskScheduleRouter.get("/", [controller.listHandler]);
 
-  // Get a user's active Task
-  taskScheduleRouter.get("/", []);
+  taskScheduleRouter.get("/:id", [controller.getHandler]);
 
-  // Get details of 1 task
-  taskScheduleRouter.get("/:id", []);
+  taskScheduleRouter.post("/", [controller.scheduleHandler]);
 
-  // Schedule a new task
-  taskScheduleRouter.post("/", []);
-
-  // Cancel a task in progress
-  taskScheduleRouter.delete("/:id", []);
+  taskScheduleRouter.delete("/:id", [controller.cancelHandler]);
 
   return taskScheduleRouter;
 };

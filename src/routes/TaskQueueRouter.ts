@@ -1,26 +1,20 @@
 import { Router } from "express";
+import { TaskQueueController } from "../controllers/TaskQueueController";
 import { TaskInfoCache } from "../data/TaskInfoCache";
 
-export const getTaskQueueRouter = async (): Promise<Router> => {
+export const getTaskQueueRouter = (taskInfo: TaskInfoCache): Router => {
   const taskQueueRouter = Router();
+  const controller = new TaskQueueController(taskInfo);
 
-  const taskInfo = TaskInfoCache.get();
-  await taskInfo.load();
+  taskQueueRouter.get("/:typeId", [controller.nextHandler]);
 
-  // Get the next task in the queue
-  taskQueueRouter.get("/:typeId", []);
+  taskQueueRouter.patch("/:typeId/:id", [controller.updateHandler]);
 
-  // Update a task from the executor
-  taskQueueRouter.patch("/:typeId/:id", []);
+  taskQueueRouter.put("/:typeId/:id", [controller.suspendHandler]);
 
-  // Suspend a task from the executor
-  taskQueueRouter.put("/:typeId/:id", []);
+  taskQueueRouter.delete("/:typeId/:id", [controller.faultHandler]);
 
-  // Put a task into faulted state
-  taskQueueRouter.delete("/:typeId/:id", []);
-
-  // Put a task into completed state
-  taskQueueRouter.post("/:typeId/:id", []);
+  taskQueueRouter.post("/:typeId/:id", [controller.completeHandler]);
 
   return taskQueueRouter;
 };

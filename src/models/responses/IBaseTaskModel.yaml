@@ -1,0 +1,26 @@
+components:
+  schemas:
+    IBaseTaskModel:
+      allOf:
+      - $ref: '#/components/schemas/IUserEntityModel'
+      - type: object
+        properties:
+          taskTypeId:
+            type: string
+            pattern: '[a-fA-F0-9]{24}'
+          taskType:
+            $ref: '#/components/schemas/ITaskTypeModel'
+          startDateTime:
+            type: string
+            format: date-time
+          endDateTime:
+            type: string
+            format: date-time
+          runTimeMs:
+            type: integer
+            format: int32
+            minimum: 0
+          parameters:
+            type: object
+          result:
+            type: object

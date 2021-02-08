@@ -1,0 +1,45 @@
+components:
+  schemas:
+    ITaskTypeModel:
+      allOf:
+      - $ref: '#/components/schemas/IBaseTaskModel'
+      - type: object
+        properties:
+          name:
+            type: string
+            pattern: '\w+'
+          description:
+            type: string
+            nullable: true
+          permissions:
+            $ref: '#/components/schemas/IPermissionClaimModel'
+            nullable: true
+          isProgressReported:
+            type: boolean
+          isSuspendable:
+            type: boolean
+          isCancelable:
+            type: boolean
+          keepInactiveForMinutes:
+            type: integer
+            format: int32
+            minimum: 0
+          parameterSchema:
+            $ref: '#/components/schemas/OpenApiSchemaObject'
+            nullable: true
+          resultSchema:
+            $ref: '#/components/schemas/OpenApiSchemaObject'
+            nullable: true
+      required:
+      - name
+      - isProgressReported
+      - isSuspendable
+      - isCancelable
+      - keepInactiveForMinutes
+    TaskTypeModelResponse:
+      allOf:
+      - $ref: '#/components/schemas/IResponseData'
+      - type: object
+        properties:
+          data:
+            $ref: '#/components/schemas/ITaskTypeModel'

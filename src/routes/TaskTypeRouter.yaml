@@ -1,0 +1,96 @@
+paths:
+  /task-type:
+    get:
+      description: Get the details of a list of TaskType
+      tags: [TaskType]
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/listPageSize'
+        - $ref: '#/components/parameters/listPageNumber'
+        - $ref: '#/components/parameters/listSort'
+        - $ref: '#/components/parameters/listQuery'
+      responses:
+        200:
+          description: The retrieved TaskType list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskTypeModelResponse'
+        400:
+          $ref: '#/components/responses/400BadRequest'
+    post:
+      description: Save a new TaskType
+      tags: [TaskType]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ITaskTypeModel'
+      responses:
+        200:
+          description: The added TaskType
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskTypeModelResponse'
+        400:
+          $ref: '#/components/responses/400ModelValidation'
+  /task-type/{id}:
+    get:
+      description: Get the details of a specific TaskType
+      tags: [TaskType]
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ObjectId'
+      responses:
+        200:
+          description: The retrieved TaskType
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskTypeModelResponse'
+        404:
+          $ref: '#/components/responses/404NotFound'
+    put:
+      description: Update an existing TaskType
+      tags: [TaskType]
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ObjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ITaskTypeModel'
+      responses:
+        200:
+          description: The updated TaskType
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskTypeModelResponse'
+        400:
+          $ref: '#/components/responses/400ModelValidation'
+        404:
+          $ref: '#/components/responses/404NotFound'
+    delete:
+      description: Delete a specific TaskType
+      tags: [TaskType]
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ObjectId'
+      responses:
+        200:
+          $ref: '#/components/responses/200Null'
+        404:
+          $ref: '#/components/responses/404NotFound'

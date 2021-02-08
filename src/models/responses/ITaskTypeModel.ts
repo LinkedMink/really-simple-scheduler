@@ -1,8 +1,8 @@
 import { OpenAPIV3 } from "openapi-types";
 import { IPermissionClaimModel } from "./IPermissionClaimModel";
-import { ITrackedEntityModel } from "./ITrackedEntityModel";
+import { IUserEntityModel } from "./IUserEntityModel";
 
-export interface ITaskTypeModel extends ITrackedEntityModel {
+export interface ITaskTypeModel extends IUserEntityModel {
   name: string;
   description?: string;
   permissions?: IPermissionClaimModel;
