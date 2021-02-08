@@ -4,7 +4,7 @@ import { trackedEntityPreValidateFunc } from "./TrackedEntity";
 import { IBaseTask, baseTaskSchemaDefinition } from "./BaseTask";
 
 export enum TaskStatus {
-  Ready = "ready",
+  Scheduled = "scheduled",
   Running = "running",
   Suspended = "suspended",
   Faulted = "faulted",
@@ -27,7 +27,7 @@ const progressSchemaDefinition = {
 
 const progressSchema = new Schema(progressSchemaDefinition);
 
-export interface IProgress<T> extends Types.Subdocument {
+export interface IProgress<T = unknown> extends Types.Subdocument {
   completedRatio: number;
   estimatedCompletedBy?: Date;
   resultSample?: T;

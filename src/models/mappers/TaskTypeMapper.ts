@@ -8,7 +8,7 @@ export class TaskTypeMapper implements IModelMapper<ITaskTypeModel, ITaskType> {
   constructor(private readonly dbModel: Model<ITaskType>) {}
 
   public convertToFrontend = (model: ITaskType): ITaskTypeModel => {
-    let returnModel: ITaskTypeModel = {
+    let returnModel: Partial<ITaskTypeModel> = {
       name: model.name,
       description: model.description,
       permissions: model.permissions,
@@ -18,11 +18,12 @@ export class TaskTypeMapper implements IModelMapper<ITaskTypeModel, ITaskType> {
       keepInactiveForMinutes: model.keepInactiveForMinutes,
       parameterSchema: model.parameterSchema,
       resultSchema: model.resultSchema,
+      progressSchema: model.progressSchema,
     };
 
-    returnModel = mapTrackedEntity(model, returnModel);
+    returnModel = mapTrackedEntity(model, returnModel as ITaskTypeModel);
 
-    return returnModel;
+    return returnModel as ITaskTypeModel;
   };
 
   public convertToBackend = (
@@ -44,7 +45,8 @@ export class TaskTypeMapper implements IModelMapper<ITaskTypeModel, ITaskType> {
       (returnModel.isCancelable = model.isCancelable),
       (returnModel.keepInactiveForMinutes = model.keepInactiveForMinutes),
       (returnModel.parameterSchema = model.parameterSchema),
-      (returnModel.resultSchema = model.resultSchema);
+      (returnModel.resultSchema = model.resultSchema),
+      (returnModel.progressSchema = model.progressSchema);
 
     return new this.dbModel(returnModel);
   };

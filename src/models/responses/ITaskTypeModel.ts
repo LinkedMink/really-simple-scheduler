@@ -12,4 +12,5 @@ export interface ITaskTypeModel extends IUserEntityModel {
   keepInactiveForMinutes: number;
   parameterSchema?: OpenAPIV3.SchemaObject;
   resultSchema?: OpenAPIV3.SchemaObject;
+  progressSchema?: OpenAPIV3.SchemaObject;
 }

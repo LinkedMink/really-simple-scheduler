@@ -37,6 +37,10 @@ const main = async () => {
     if (t.resultSchema) {
       doc.components.schemas[t.name + "Results"] = t.resultSchema;
     }
+
+    if (t.progressSchema) {
+      doc.components.schemas[t.name + "Progress"] = t.progressSchema;
+    }
   });
 
   await fs.promises.writeFile(TASK_TYPE_DOC, yaml.stringify(doc));

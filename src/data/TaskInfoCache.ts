@@ -26,7 +26,7 @@ export class TaskInfoCache {
   private static instance: TaskInfoCache;
   private readonly logger = Logger.get(TaskInfoCache.name);
   private _permissionMap = new Map<string, string>();
-  private _taskTypeMap = new Map<string, ITaskType>();
+  private _typeMap = new Map<string, ITaskType>();
   private _isInitialized = false;
 
   get isInitialized(): boolean {
@@ -47,12 +47,16 @@ export class TaskInfoCache {
     return this._permissionMap;
   }
 
+  get typeMap(): Map<string, ITaskType> {
+    return this._typeMap;
+  }
+
   async load(): Promise<void> {
     this.logger.verbose(`Loading ${TaskType.name} - Start`);
 
     const taskTypes = await TaskType.find().exec();
     taskTypes.forEach(t => {
-      this._taskTypeMap.set(t.name, t);
+      this._typeMap.set(t.name, t);
       setPermissionMap(this._permissionMap, t.name, t.permissions as IPermissionClaim);
     });
 

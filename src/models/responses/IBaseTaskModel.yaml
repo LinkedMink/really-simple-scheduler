@@ -10,6 +10,9 @@ components:
             pattern: '[a-fA-F0-9]{24}'
           taskType:
             $ref: '#/components/schemas/ITaskTypeModel'
+          scheduledDateTime:
+            type: string
+            format: date-time
           startDateTime:
             type: string
             format: date-time

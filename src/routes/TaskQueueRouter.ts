@@ -1,20 +1,46 @@
-import { Router } from "express";
+import { Request, Router } from "express";
 import { TaskQueueController } from "../controllers/TaskQueueController";
 import { TaskInfoCache } from "../data/TaskInfoCache";
+import { authenticateJwt, authorizeJwtClaimByResource } from "../middleware/Authorization";
 
 export const getTaskQueueRouter = (taskInfo: TaskInfoCache): Router => {
   const taskQueueRouter = Router();
   const controller = new TaskQueueController(taskInfo);
 
-  taskQueueRouter.get("/:typeId", [controller.nextHandler]);
+  const authorizeManageHandler = authorizeJwtClaimByResource(
+    taskInfo.permissionMap,
+    (req: Request) => req.params.typeName + "Manage"
+  );
 
-  taskQueueRouter.patch("/:typeId/:id", [controller.updateHandler]);
+  taskQueueRouter.get("/:typeName", [
+    authenticateJwt,
+    authorizeManageHandler,
+    controller.nextHandler
+  ]);
 
-  taskQueueRouter.put("/:typeId/:id", [controller.suspendHandler]);
+  taskQueueRouter.patch("/:typeName/:id", [
+    authenticateJwt,
+    authorizeManageHandler,
+    controller.updateHandler
+  ]);
 
-  taskQueueRouter.delete("/:typeId/:id", [controller.faultHandler]);
+  taskQueueRouter.put("/:typeName/:id", [
+    authenticateJwt,
+    authorizeManageHandler,
+    controller.suspendHandler
+  ]);
 
-  taskQueueRouter.post("/:typeId/:id", [controller.completeHandler]);
+  taskQueueRouter.delete("/:typeName/:id", [
+    authenticateJwt,
+    authorizeManageHandler,
+    controller.faultHandler
+  ]);
+
+  taskQueueRouter.post("/:typeName/:id", [
+    authenticateJwt,
+    authorizeManageHandler,
+    controller.completeHandler
+  ]);
 
   return taskQueueRouter;
 };

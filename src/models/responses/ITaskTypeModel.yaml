@@ -30,6 +30,9 @@ components:
           resultSchema:
             $ref: '#/components/schemas/OpenApiSchemaObject'
             nullable: true
+          progressSchema:
+            $ref: '#/components/schemas/OpenApiSchemaObject'
+            nullable: true
       required:
       - name
       - isProgressReported

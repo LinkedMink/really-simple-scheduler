@@ -1,12 +1,20 @@
 import { SchemaTypes, Types } from "mongoose";
-import { ITaskType, TaskType, taskTypeSchema } from "./TaskType";
+import { ITaskType, taskTypeSchema } from "./TaskType";
 import { IUserEntity, userEntitySchemaDefinition } from "./UserEntity";
 
 export const baseTaskSchemaDefinition = Object.assign({}, userEntitySchemaDefinition, {
+  taskTypeId: {
+    type: SchemaTypes.ObjectId,
+    index: true,
+    required: true,
+  },
   taskType: taskTypeSchema,
-  startDateTime: {
+  scheduledDateTime: {
     type: SchemaTypes.Date,
     required: true,
+  },
+  startDateTime: {
+    type: SchemaTypes.Date,
   },
   endDateTime: {
     type: SchemaTypes.Date,
@@ -25,7 +33,8 @@ export const baseTaskSchemaDefinition = Object.assign({}, userEntitySchemaDefini
 export interface IBaseTask<TResult = unknown, TParams = unknown> extends IUserEntity {
   taskTypeId: Types.ObjectId;
   taskType: ITaskType;
-  startDateTime: Date;
+  scheduledDateTime: Date;
+  startDateTime?: Date;
   endDateTime?: Date;
   runTimeMs?: number;
   parameters?: TParams;

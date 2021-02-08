@@ -1,5 +1,5 @@
 paths:
-  /task/schedule/search:
+  /task/schedule/{typeName}/search:
     get:
       tags: [Task Schedule]
       security:
@@ -20,7 +20,7 @@ paths:
                   $ref: '#/components/schemas/TaskModelResponse'
         400:
           $ref: '#/components/responses/400BadRequest'
-  /task/schedule/:
+  /task/schedule/{typeName}:
     get:
       tags: [Task Schedule]
       security:
@@ -54,7 +54,7 @@ paths:
                 $ref: '#/components/schemas/TaskModelResponse'
         400:
           $ref: '#/components/responses/400ModelValidation'
-  /task/schedule/{id}:
+  /task/schedule/{typeName}/{id}:
     get:
       tags: [Task Schedule]
       security:

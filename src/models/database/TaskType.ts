@@ -60,6 +60,10 @@ const taskTypeSchemaDefinition = Object.assign({}, userEntitySchemaDefinition, {
     type: SchemaTypes.Mixed,
     validate: validateOpenApiSchema,
   },
+  progressSchema: {
+    type: SchemaTypes.Mixed,
+    validate: validateOpenApiSchema,
+  },
 });
 
 export const taskTypeSchema = new Schema(taskTypeSchemaDefinition);
@@ -75,6 +79,7 @@ export interface ITaskType extends IUserEntity {
   keepInactiveForMinutes: number;
   parameterSchema?: OpenAPIV3.SchemaObject;
   resultSchema?: OpenAPIV3.SchemaObject;
+  progressSchema?: OpenAPIV3.SchemaObject;
 }
 
 export const TaskType = model<ITaskType>("Task-Type", taskTypeSchema);
