@@ -5,7 +5,7 @@ components:
       properties:
         type:
           type: string
-          pattern: '\w+'
+          pattern: '[a-zA-Z0-9_-]+'
         parameters:
           type: object
           nullable: true

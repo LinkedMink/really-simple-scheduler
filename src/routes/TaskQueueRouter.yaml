@@ -6,7 +6,7 @@ components:
       required: true
       schema:
         type: string
-        pattern: '\w+'
+        pattern: '[a-zA-Z0-9_-]+'
 paths:
   /task/queue/{typeName}:
     get:

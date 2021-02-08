@@ -5,17 +5,17 @@ components:
       properties:
         baseClaimName:
           type: string
-          pattern: '[a-zA-Z]+'
+          pattern: '[a-zA-Z0-9_-]+'
           nullable: true
         readClaim:
           type: string
-          pattern: '[a-zA-Z]+'
+          pattern: '[a-zA-Z0-9_-]+'
           nullable: true
         scheduleClaim:
           type: string
-          pattern: '[a-zA-Z]+'
+          pattern: '[a-zA-Z0-9_-]+'
           nullable: true
         manageClaim:
           type: string
-          pattern: '[a-zA-Z]+'
+          pattern: '[a-zA-Z0-9_-]+'
           nullable: true
