@@ -2,7 +2,7 @@ import { ITaskTypeModel } from "./ITaskTypeModel";
 import { IUserEntityModel } from "./IUserEntityModel";
 
 export interface IBaseTaskModel<TResult = unknown, TParams = unknown> extends IUserEntityModel {
-  taskTypeId: string;
+  taskTypeName: string;
   taskType: ITaskTypeModel;
   scheduledDateTime: Date;
   startDateTime?: Date;

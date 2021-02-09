@@ -1,9 +1,9 @@
 import { Request, Router } from "express";
 import { TaskScheduleController } from "../controllers/TaskScheduleController";
-import { TaskInfoCache } from "../data/TaskInfoCache";
+import { TaskTypeData } from "../data/TaskTypeData";
 import { authenticateJwt, authorizeJwtClaimByResource } from "../middleware/Authorization";
 
-export const getTaskScheduleRouter = (taskInfo: TaskInfoCache): Router => {
+export const getTaskScheduleRouter = (taskInfo: TaskTypeData): Router => {
   const taskScheduleRouter = Router();
   const controller = new TaskScheduleController(taskInfo);
 

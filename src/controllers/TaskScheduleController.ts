@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { FilterQuery, Query } from "mongoose";
-import { TaskInfoCache } from "../data/TaskInfoCache";
+import { TaskTypeData } from "../data/TaskTypeData";
 import { Logger } from "../infastructure/Logger";
 import { IUserSession } from "../middleware/Passport";
 import { ITask, Task, TaskStatus } from "../models/database/Task";
@@ -14,7 +14,9 @@ const DEFAULT_ITEMS_PER_PAGE = 20;
 export class TaskScheduleController {
   private readonly logger = Logger.get(TaskScheduleController.name);
   
-  constructor(private readonly taskInfo: TaskInfoCache) {}
+  constructor(
+    private readonly taskInfo: TaskTypeData
+  ) {}
 
   searchHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const filter = this.getRequestFilter(req, res);

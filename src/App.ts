@@ -2,14 +2,15 @@
 
 import bodyParser from "body-parser";
 import express from "express";
-import expressWs from "express-ws";
+import { createServer } from "http";
 import passport from "passport";
+import { Server as IoServer } from "socket.io";
 
 import { config } from "./infastructure/Config";
 import { ConfigKey } from "./infastructure/ConfigKey";
 import { connectSingletonDatabase } from "./infastructure/Database";
 import { initializeLogger, Logger } from "./infastructure/Logger";
-import { corsMiddleware } from "./middleware/Cors";
+import { corsMiddleware, corsOptions } from "./middleware/Cors";
 import { getErrorMiddleware } from "./middleware/Error";
 import { logRequestMiddleware } from "./middleware/LogRequest";
 import { addJwtStrategy } from "./middleware/Passport";
@@ -18,26 +19,31 @@ import { pingRouter } from "./routes/PingRouter";
 import { getTaskScheduleRouter } from "./routes/TaskScheduleRouter";
 import { getTaskQueueRouter } from "./routes/TaskQueueRouter";
 import { taskTypeRouter } from "./routes/TaskTypeRouter";
-import { TaskInfoCache } from "./data/TaskInfoCache";
+import { TaskTypeData } from "./data/TaskTypeData";
+import { wrapRequestHandler } from "./infastructure/Socket";
+import { authenticateJwt } from "./middleware/Authorization";
+import { setTaskProgressNamespace } from "./namespaces/TaskProgress";
+import { setTaskRunNamespace } from "./namespaces/TaskRun";
 
 initializeLogger();
 void connectSingletonDatabase();
 
 const app = express();
-expressWs(app);
+const httpServer = createServer(app);
 
 app.use(logRequestMiddleware());
 app.use(bodyParser.json());
 
 addJwtStrategy(passport);
-app.use(passport.initialize());
+const passportHandler = passport.initialize();
+app.use(passportHandler);
 
 app.use(corsMiddleware);
 
 app.use("/", pingRouter);
 app.use("/task-type", taskTypeRouter);
 
-void TaskInfoCache.get().then(cache => {
+void TaskTypeData.get().then(cache => {
   app.use("/task/queue", getTaskQueueRouter(cache));
   app.use("/task/schedule", getTaskScheduleRouter(cache));
 
@@ -54,5 +60,11 @@ void TaskInfoCache.get().then(cache => {
     });
 });
 
+const io = new IoServer(httpServer);
+io.use(wrapRequestHandler(passportHandler));
+io.use(wrapRequestHandler(authenticateJwt));
+setTaskRunNamespace(io)
+setTaskProgressNamespace(io);
+
 const listenPort = config.getNumber(ConfigKey.ListenPort);
-export const server = app.listen(listenPort);
+httpServer.listen(listenPort);

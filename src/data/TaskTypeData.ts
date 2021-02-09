@@ -1,14 +1,6 @@
 import { Logger } from "../infastructure/Logger";
 import { ITaskType, TaskType } from "../models/database/TaskType";
 import { IPermissionClaim } from "../models/database/PermissionClaim";
-import {
-  AgingCacheWriteMode,
-  AgingCacheReplacementPolicy,
-  IAgingCacheOptions,
-  MemoryStorageProvider,
-  StorageHierarchy,
-  createAgingCache,
-} from "@linkedmink/multilevel-aging-cache";
 
 const setPermissionMap = (map: Map<string, string>, name: string, perm: IPermissionClaim) => {
   if (perm.baseClaimName) {
@@ -22,9 +14,9 @@ const setPermissionMap = (map: Map<string, string>, name: string, perm: IPermiss
   }
 };
 
-export class TaskInfoCache {
-  private static instance: TaskInfoCache;
-  private readonly logger = Logger.get(TaskInfoCache.name);
+export class TaskTypeData {
+  private static instance: TaskTypeData;
+  private readonly logger = Logger.get(TaskTypeData.name);
   private _permissionMap = new Map<string, string>();
   private _typeMap = new Map<string, ITaskType>();
   private _isInitialized = false;
@@ -33,14 +25,14 @@ export class TaskInfoCache {
     return this._isInitialized;
   }
 
-  static async get(): Promise<TaskInfoCache> {
-    if (TaskInfoCache.instance) {
-      return TaskInfoCache.instance;
+  static async get(): Promise<TaskTypeData> {
+    if (TaskTypeData.instance) {
+      return TaskTypeData.instance;
     }
 
-    TaskInfoCache.instance = new TaskInfoCache();
-    await TaskInfoCache.instance.load();
-    return TaskInfoCache.instance;
+    TaskTypeData.instance = new TaskTypeData();
+    await TaskTypeData.instance.load();
+    return TaskTypeData.instance;
   }
 
   get permissionMap(): Map<string, string> {

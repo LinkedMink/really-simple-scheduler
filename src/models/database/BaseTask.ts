@@ -3,8 +3,8 @@ import { ITaskType, taskTypeSchema } from "./TaskType";
 import { IUserEntity, userEntitySchemaDefinition } from "./UserEntity";
 
 export const baseTaskSchemaDefinition = Object.assign({}, userEntitySchemaDefinition, {
-  taskTypeId: {
-    type: SchemaTypes.ObjectId,
+  taskTypeName: {
+    type: SchemaTypes.String,
     index: true,
     required: true,
   },
@@ -31,7 +31,7 @@ export const baseTaskSchemaDefinition = Object.assign({}, userEntitySchemaDefini
 });
 
 export interface IBaseTask<TResult = unknown, TParams = unknown> extends IUserEntity {
-  taskTypeId: Types.ObjectId;
+  taskTypeName: string;
   taskType: ITaskType;
   scheduledDateTime: Date;
   startDateTime?: Date;

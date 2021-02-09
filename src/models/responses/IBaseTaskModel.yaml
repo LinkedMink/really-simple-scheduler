@@ -5,9 +5,9 @@ components:
       - $ref: '#/components/schemas/IUserEntityModel'
       - type: object
         properties:
-          taskTypeId:
+          taskTypeName:
             type: string
-            pattern: '[a-fA-F0-9]{24}'
+            pattern: '[a-zA-Z0-9_-]+'
           taskType:
             $ref: '#/components/schemas/ITaskTypeModel'
           scheduledDateTime:

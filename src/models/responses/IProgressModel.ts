@@ -1,4 +1,4 @@
-export interface IProgressModel<T> {
+export interface IProgressModel<T = unknown> {
   completedRatio: number;
   estimatedCompletedBy?: Date;
   resultSample?: T;
