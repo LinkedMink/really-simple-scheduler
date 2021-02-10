@@ -34,7 +34,6 @@ export const connectSingletonDatabase = (): Promise<typeof mongoose> => {
 
   mongoose.connection.on("error", error => {
     logger.error({ message: error as Error });
-    // TODO handle error
   });
 
   return mongoose

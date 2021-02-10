@@ -10,7 +10,7 @@ import { config } from "./infastructure/Config";
 import { ConfigKey } from "./infastructure/ConfigKey";
 import { connectSingletonDatabase } from "./infastructure/Database";
 import { initializeLogger, Logger } from "./infastructure/Logger";
-import { corsMiddleware, corsOptions } from "./middleware/Cors";
+import { corsMiddleware } from "./middleware/Cors";
 import { getErrorMiddleware } from "./middleware/Error";
 import { logRequestMiddleware } from "./middleware/LogRequest";
 import { addJwtStrategy } from "./middleware/Passport";

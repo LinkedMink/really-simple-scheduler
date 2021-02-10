@@ -1,6 +1,8 @@
 import { Logger } from "../infastructure/Logger";
 import { ITaskType, TaskType } from "../models/database/TaskType";
 import { IPermissionClaim } from "../models/database/PermissionClaim";
+import { Model, Schema } from "mongoose";
+import { ITask, Task } from "../models/database/Task";
 
 const setPermissionMap = (map: Map<string, string>, name: string, perm: IPermissionClaim) => {
   if (perm.baseClaimName) {
@@ -19,6 +21,7 @@ export class TaskTypeData {
   private readonly logger = Logger.get(TaskTypeData.name);
   private _permissionMap = new Map<string, string>();
   private _typeMap = new Map<string, ITaskType>();
+  private _modelMap = new Map<string, Model<ITask>>();
   private _isInitialized = false;
 
   get isInitialized(): boolean {
@@ -43,12 +46,20 @@ export class TaskTypeData {
     return this._typeMap;
   }
 
+  get modelMap(): Map<string, Model<ITask>> {
+    return this._modelMap;
+  }
+
   async load(): Promise<void> {
     this.logger.verbose(`Loading ${TaskType.name} - Start`);
 
     const taskTypes = await TaskType.find().exec();
     taskTypes.forEach(t => {
       this._typeMap.set(t.name, t);
+
+      const discriminatedT = Task.discriminator<ITask>(t.name, new Schema({}, { discriminatorKey: 'taskTypeName' }));
+      this._modelMap.set(t.name, discriminatedT);
+      
       setPermissionMap(this._permissionMap, t.name, t.permissions as IPermissionClaim);
     });
 

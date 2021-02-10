@@ -5,6 +5,7 @@ import { response } from "../models/responses/IResponseData";
 import { IUserEntityModel } from "../models/responses/IUserEntityModel";
 import { IJwtPayload, IUserSession, PASSPORT_JWT_STRATEGY } from "./Passport";
 import { isError, isString } from "../infastructure/TypeCheck";
+import { Socket } from "socket.io";
 
 const GENERIC_AUTH_ERROR = "Not Authorized";
 
@@ -76,6 +77,7 @@ export const authorizeJwtClaim = (requiredClaims: string[]) => {
   };
 };
 
+export type SocketResourceFunc = (req: Socket) => string;
 export type RequestResourceFunc = (req: Request) => string;
 
 /**

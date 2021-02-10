@@ -34,9 +34,9 @@
   },
   "dependencies": {
     "@apidevtools/openapi-schemas": "^2.0.4",
-    "@linkedmink/multilevel-aging-cache": "~0.4.7",
-    "@linkedmink/multilevel-aging-cache-ioredis": "~0.4.7",
-    "@linkedmink/multilevel-aging-cache-mongoose": "~0.4.7",
+    "@linkedmink/multilevel-aging-cache": "~0.4.9",
+    "@linkedmink/multilevel-aging-cache-ioredis": "~0.4.9",
+    "@linkedmink/multilevel-aging-cache-mongoose": "~0.4.9",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",

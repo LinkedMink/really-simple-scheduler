@@ -13,7 +13,6 @@ export enum ConfigKey {
   MongoDbConnectionString = "MONGO_DB_CONNECTION_STRING",
   RedisMode = "REDIS_MODE",
   RedisHosts = "REDIS_HOSTS",
-  RedisKeyPrefix = "REDIS_KEY_PREFIX",
 
   JobCacheKeepMinutes = "JOB_CACHE_KEEP_MINUTES",
   JobCacheMaxEntries = "JOB_CACHE_MAX_ENTRIES",
@@ -35,5 +34,4 @@ export const configDefaultMap: Map<ConfigKey, string | undefined> = new Map([
 
   [ConfigKey.RedisMode, "Single"],
   [ConfigKey.RedisHosts, JSON.stringify({ host: "localhost", port: 6379 })],
-  [ConfigKey.RedisKeyPrefix, "rss"],
 ]);

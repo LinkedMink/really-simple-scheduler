@@ -1,11 +1,12 @@
 import { Request, Router } from "express";
 import { TaskScheduleController } from "../controllers/TaskScheduleController";
+import { taskEventExchange } from "../data/TaskEvents";
 import { TaskTypeData } from "../data/TaskTypeData";
 import { authenticateJwt, authorizeJwtClaimByResource } from "../middleware/Authorization";
 
 export const getTaskScheduleRouter = (taskInfo: TaskTypeData): Router => {
   const taskScheduleRouter = Router();
-  const controller = new TaskScheduleController(taskInfo);
+  const controller = new TaskScheduleController(taskInfo, taskEventExchange);
 
   const authorizeReadHandler = authorizeJwtClaimByResource(
     taskInfo.permissionMap,

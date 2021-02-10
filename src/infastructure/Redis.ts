@@ -1,9 +1,12 @@
-import { ISerializer, StringSerializer } from "@linkedmink/multilevel-aging-cache";
+import { ISerializer, IStorageProvider } from "@linkedmink/multilevel-aging-cache";
 import {
-  RedisPubSubStorageProvider,
-  IRedisStorageProviderOptions,
+  RedisPubSubProvider,
+  IRedisProviderOptions,
+  RedisProvider,
 } from "@linkedmink/multilevel-aging-cache-ioredis";
+import { ObjectIdSerializer } from "@linkedmink/multilevel-aging-cache-mongoose";
 import Redis from "ioredis";
+import { Types } from "mongoose";
 
 import { config } from "./Config";
 import { ConfigKey } from "./ConfigKey";
@@ -24,34 +27,38 @@ interface ISentinelGroup {
   name: string;
 }
 
-const createRedisClient = (): Redis.Redis | Redis.Cluster => {
+const createRedisClient = (keyPrefix: string): Redis.Redis | Redis.Cluster => {
   const stringMode = config.getString(ConfigKey.RedisMode);
   const mode = stringMode as RedisMode;
 
   if (mode === RedisMode.Single) {
     const hostPort = config.getJson<IHostPort>(ConfigKey.RedisHosts);
-    return new Redis(hostPort.port, hostPort.host);
+    return new Redis(hostPort.port, hostPort.host, { keyPrefix });
   } else if (mode === RedisMode.Sentinel) {
     const group = config.getJson<ISentinelGroup>(ConfigKey.RedisHosts);
-    return new Redis(group);
+    return new Redis({ ...group, keyPrefix });
   } else if (mode === RedisMode.Cluster) {
     const hostArray = config.getJson<IHostPort[]>(ConfigKey.RedisHosts);
-    return new Redis.Cluster(hostArray);
+    return new Redis.Cluster(hostArray, { redisOptions: { keyPrefix }});
   } else {
     throw Error(`Unsupported RedisMode: ${stringMode}; Can be Single, Sentinel, or Cluster`);
   }
 };
 
 export const createRedisStorageProvider = <T>(
-  serializer: ISerializer<T>
-): RedisPubSubStorageProvider<string, T> => {
-  const redisClient = createRedisClient();
-  const redisChannel = createRedisClient();
+  keyPrefix: string,
+  valueSerializer: ISerializer<T>,
+  channelName?: string
+): IStorageProvider<Types.ObjectId, T> => {
   const redisOptions = {
-    keyPrefix: config.getString(ConfigKey.RedisKeyPrefix),
-    keySerializer: new StringSerializer(),
-    valueSerializer: serializer,
-  } as IRedisStorageProviderOptions<string, T>;
+    keyPrefix,
+    keySerializer: new ObjectIdSerializer(),
+    valueSerializer,
+    channelName,
+    isPersistable: false
+  } as IRedisProviderOptions<Types.ObjectId, T>;
 
-  return new RedisPubSubStorageProvider(redisClient, redisOptions, redisChannel);
+  return channelName
+    ? new RedisPubSubProvider(createRedisClient(keyPrefix), createRedisClient(keyPrefix), redisOptions)
+    : new RedisProvider(createRedisClient(keyPrefix), redisOptions);
 };
