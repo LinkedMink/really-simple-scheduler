@@ -1,23 +1,32 @@
 import { basename } from "path";
 import { Server as IoServer, Socket } from "socket.io";
 import { TaskRunController } from "../controllers/TaskRunController";
-import { SocketIoEvent } from "../infastructure/Socket";
+import { TaskEventDispatch } from "../data/TaskEvents";
+import { TaskTypeData } from "../data/TaskTypeData";
+import { SocketIoEvent, wrapRequestHandler } from "../infastructure/Socket";
+import { authorizeJwtClaim } from "../middleware/Authorization";
 
 export enum TaskRunEvent {
   Initiate = "initiate",
-  ReportProgress = 'reportProgress',
+  ReportProgress = "reportProgress",
 }
 
-export const setTaskRunNamespace = (io: IoServer): void => {
-  const scope = basename(__filename)
+export const registerTaskRun = (
+  io: IoServer,
+  taskInfo: TaskTypeData,
+  taskDispatch: TaskEventDispatch
+): void => {
+  taskInfo.types.forEach(type => {
+    const namespace = io.of(`/task/run/${type.name}`);
+    const auth = wrapRequestHandler(authorizeJwtClaim([type.name + "Manage"]));
+    namespace.use(auth);
 
-  const namespace = io.of("/task/run");
+    namespace.on(SocketIoEvent.Connection, (socket: Socket) => {
+      const controller = new TaskRunController(socket, taskInfo, taskDispatch);
 
-  io.on(SocketIoEvent.Connection, (socket: Socket) => {
-    const controller = new TaskRunController(socket);
+      socket.on(TaskRunEvent.Initiate, controller.initiateHandler);
 
-    socket.on(`${scope}:${TaskRunEvent.Initiate}`, controller.initiateHandler)
-
-    socket.on(`${scope}:${TaskRunEvent.ReportProgress}`, controller.reportProgressHandler)
-  })
+      socket.on(TaskRunEvent.ReportProgress, controller.reportProgressHandler);
+    });
+  });
 };

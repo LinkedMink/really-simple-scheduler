@@ -22,8 +22,8 @@ import { taskTypeRouter } from "./routes/TaskTypeRouter";
 import { TaskTypeData } from "./data/TaskTypeData";
 import { wrapRequestHandler } from "./infastructure/Socket";
 import { authenticateJwt } from "./middleware/Authorization";
-import { setTaskProgressNamespace } from "./namespaces/TaskProgress";
-import { setTaskRunNamespace } from "./namespaces/TaskRun";
+import { registerTaskProgress } from "./namespaces/TaskProgress";
+import { registerTaskRun } from "./namespaces/TaskRun";
 
 initializeLogger();
 void connectSingletonDatabase();
@@ -43,9 +43,10 @@ app.use(corsMiddleware);
 app.use("/", pingRouter);
 app.use("/task-type", taskTypeRouter);
 
-void TaskTypeData.get().then(cache => {
-  app.use("/task/queue", getTaskQueueRouter(cache));
-  app.use("/task/schedule", getTaskScheduleRouter(cache));
+const taskInfo = TaskTypeData.get();
+void taskInfo.load().then(taskDispatch => {
+  app.use("/task/queue", getTaskQueueRouter(taskInfo, taskDispatch));
+  app.use("/task/schedule", getTaskScheduleRouter(taskInfo, taskDispatch));
 
   app.use(getErrorMiddleware());
 
@@ -58,13 +59,14 @@ void TaskTypeData.get().then(cache => {
       Logger.get().info("Swagger Disabled");
       Logger.get().verbose({ message: error as Error });
     });
-});
 
-const io = new IoServer(httpServer);
-io.use(wrapRequestHandler(passportHandler));
-io.use(wrapRequestHandler(authenticateJwt));
-setTaskRunNamespace(io)
-setTaskProgressNamespace(io);
+  const io = new IoServer(httpServer);
+  io.use(wrapRequestHandler(passportHandler));
+  io.use(wrapRequestHandler(authenticateJwt));
+
+  registerTaskProgress(io, taskInfo, taskDispatch);
+  registerTaskRun(io, taskInfo, taskDispatch);
+});
 
 const listenPort = config.getNumber(ConfigKey.ListenPort);
 httpServer.listen(listenPort);

@@ -45,7 +45,7 @@ const taskSchemaDefinition = Object.assign({}, baseTaskSchemaDefinition, {
   },
 });
 
-const options = { discriminatorKey: 'taskTypeName' };
+const options = { discriminatorKey: "taskTypeName" };
 export const taskSchema = new Schema(taskSchemaDefinition, options);
 taskSchema.pre("validate", trackedEntityPreValidateFunc);
 

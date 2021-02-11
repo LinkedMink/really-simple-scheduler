@@ -39,7 +39,7 @@ const createRedisClient = (keyPrefix: string): Redis.Redis | Redis.Cluster => {
     return new Redis({ ...group, keyPrefix });
   } else if (mode === RedisMode.Cluster) {
     const hostArray = config.getJson<IHostPort[]>(ConfigKey.RedisHosts);
-    return new Redis.Cluster(hostArray, { redisOptions: { keyPrefix }});
+    return new Redis.Cluster(hostArray, { redisOptions: { keyPrefix } });
   } else {
     throw Error(`Unsupported RedisMode: ${stringMode}; Can be Single, Sentinel, or Cluster`);
   }
@@ -55,10 +55,14 @@ export const createRedisStorageProvider = <T>(
     keySerializer: new ObjectIdSerializer(),
     valueSerializer,
     channelName,
-    isPersistable: false
+    isPersistable: false,
   } as IRedisProviderOptions<Types.ObjectId, T>;
 
   return channelName
-    ? new RedisPubSubProvider(createRedisClient(keyPrefix), createRedisClient(keyPrefix), redisOptions)
+    ? new RedisPubSubProvider(
+        createRedisClient(keyPrefix),
+        createRedisClient(keyPrefix),
+        redisOptions
+      )
     : new RedisProvider(createRedisClient(keyPrefix), redisOptions);
 };

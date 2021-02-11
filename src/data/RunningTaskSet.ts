@@ -1,30 +1,45 @@
 import { IAgingCache } from "@linkedmink/multilevel-aging-cache";
-import { EventEmitter } from "events"
+import { EventEmitter } from "events";
 import { Types } from "mongoose";
 import { Logger } from "../infastructure/Logger";
-import { ITask, TaskStatus } from "../models/database/Task";
-
+import { IProgress, ITask, TaskStatus } from "../models/database/Task";
 
 export class RunningTaskSet<T extends ITask> extends EventEmitter {
   private readonly logger = Logger.get(RunningTaskSet.name);
 
-  constructor(
-    private readonly runningCache: IAgingCache<Types.ObjectId, T>
-  ) {
-    super()
+  constructor(private readonly cache: IAgingCache<Types.ObjectId, T>) {
+    super();
   }
 
-  start(task: T): void {
-    if (task.state !== TaskStatus.Scheduled && task.state !== TaskStatus.Suspended) {
-      this.logger.warn(`Task is not in a state that can be started: ${task.id}`);
-      return;
-    }
-  }
+  get = this.cache.get.bind(this.cache);
 
-  cancel(task: T): void {
-    if (task.state !== TaskStatus.Running) {
-      this.logger.warn(`Task is not in a state that can be canceled: ${task.id}`);
-      return;
-    }
-  }
+  start = async (task: T): Promise<void> => {
+    task.status = TaskStatus.Running;
+    await this.cache.set(task._id, task);
+  };
+
+  fault = async (task: T, reason: unknown): Promise<void> => {
+    task.status = TaskStatus.Faulted;
+    task.result = reason;
+    await this.cache.set(task._id, task);
+    await this.cache.clear(task._id);
+  };
+
+  cancel = async (task: T): Promise<void> => {
+    task.status = TaskStatus.Canceled;
+    await this.cache.set(task._id, task);
+    await this.cache.clear(task._id);
+  };
+
+  complete = async (task: T, result: unknown): Promise<void> => {
+    task.status = TaskStatus.Complete;
+    task.result = result;
+    await this.cache.set(task._id, task);
+    await this.cache.clear(task._id);
+  };
+
+  progress = async (task: T, progress: IProgress): Promise<void> => {
+    task.progress = progress;
+    await this.cache.set(task._id, task);
+  };
 }

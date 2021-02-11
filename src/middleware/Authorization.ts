@@ -83,7 +83,7 @@ export type RequestResourceFunc = (req: Request) => string;
 /**
  * @param resourceClaimMap Resource Name -> Required Claims
  */
-export const authorizeJwtClaimByResource = (
+export const authorizeJwtClaimByRequest = (
   resourceClaimMap: Map<string, string>,
   resourceFunc: RequestResourceFunc
 ) => {

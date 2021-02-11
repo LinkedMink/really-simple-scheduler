@@ -25,6 +25,5 @@ export const logSocketMiddleware = (): MiddlewareHandler => {
     logger.http(`Socket Connected: ${socket.request.url}`);
 
     next();
-
   };
 };

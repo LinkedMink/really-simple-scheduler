@@ -1,45 +1,49 @@
 import { Request, Router } from "express";
 import { TaskQueueController } from "../controllers/TaskQueueController";
+import { TaskEventDispatch } from "../data/TaskEvents";
 import { TaskTypeData } from "../data/TaskTypeData";
-import { authenticateJwt, authorizeJwtClaimByResource } from "../middleware/Authorization";
+import { authenticateJwt, authorizeJwtClaimByRequest } from "../middleware/Authorization";
 
-export const getTaskQueueRouter = (taskInfo: TaskTypeData): Router => {
+export const getTaskQueueRouter = (
+  taskInfo: TaskTypeData,
+  taskDispatch: TaskEventDispatch
+): Router => {
   const taskQueueRouter = Router();
-  const controller = new TaskQueueController(taskInfo);
+  const controller = new TaskQueueController(taskInfo, taskDispatch);
 
-  const authorizeManageHandler = authorizeJwtClaimByResource(
-    taskInfo.permissionMap,
+  const authorizeManageHandler = authorizeJwtClaimByRequest(
+    taskInfo.permissions,
     (req: Request) => req.params.typeName + "Manage"
   );
 
   taskQueueRouter.get("/:typeName", [
     authenticateJwt,
     authorizeManageHandler,
-    controller.nextHandler
+    controller.nextHandler,
   ]);
 
   taskQueueRouter.patch("/:typeName/:id", [
     authenticateJwt,
     authorizeManageHandler,
-    controller.updateHandler
+    controller.updateHandler,
   ]);
 
   taskQueueRouter.put("/:typeName/:id", [
     authenticateJwt,
     authorizeManageHandler,
-    controller.suspendHandler
+    controller.suspendHandler,
   ]);
 
   taskQueueRouter.delete("/:typeName/:id", [
     authenticateJwt,
     authorizeManageHandler,
-    controller.faultHandler
+    controller.faultHandler,
   ]);
 
   taskQueueRouter.post("/:typeName/:id", [
     authenticateJwt,
     authorizeManageHandler,
-    controller.completeHandler
+    controller.completeHandler,
   ]);
 
   return taskQueueRouter;
