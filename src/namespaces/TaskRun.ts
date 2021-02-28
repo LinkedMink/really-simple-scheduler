@@ -11,6 +11,11 @@ export enum TaskRunEvent {
   ReportProgress = "reportProgress",
 }
 
+export enum TaskRunOutboundEvent {
+  Canceled = "canceled",
+  TaskPeeked = 'taskPeeked'
+}
+
 export const registerTaskRun = (
   io: IoServer,
   taskInfo: TaskTypeData,

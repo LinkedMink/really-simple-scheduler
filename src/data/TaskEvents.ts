@@ -7,10 +7,11 @@ export enum TaskEvent {
   Scheduled = "scheduled",
   Started = "started",
   Suspended = "suspended",
-  Failed = "Failed",
+  Failed = "failed",
   Canceled = "canceled",
   Completed = "completed",
   Progressed = "progressed",
+  CancelInitiated = "cancelInitiated",
 }
 
 export class TaskEventDispatch extends EventEmitter {
@@ -26,5 +27,6 @@ export class TaskEventDispatch extends EventEmitter {
     this.addListener(`${type}:${TaskEvent.Canceled}`, data.runningSet.cancel);
     this.addListener(`${type}:${TaskEvent.Completed}`, data.runningSet.complete);
     this.addListener(`${type}:${TaskEvent.Progressed}`, data.runningSet.progress);
+    this.addListener(`${type}:${TaskEvent.CancelInitiated}`, data.runningSet.progress);
   };
 }

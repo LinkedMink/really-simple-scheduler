@@ -23,9 +23,9 @@ export const registerTaskProgress = (
 ): void => {
   taskInfo.types.forEach(type => {
     const namespace = io.of(`/task/progress/${type.name}`);
-    const auth = wrapRequestHandler(authorizeJwtClaim([type.name + "Manage"]));
-    namespace.use(auth);
     namespace.use(wrapRequestHandler(corsMiddleware));
+    const auth = wrapRequestHandler(authorizeJwtClaim([type.name + "Read"]));
+    namespace.use(auth);
 
     namespace.on(SocketIoEvent.Connection, (socket: Socket) => {
       const controller = new TaskProgressController(socket, taskInfo, taskDispatch);

@@ -153,7 +153,7 @@ export class TaskScheduleController {
       return;
     }
 
-    this.taskDispatch.dispatch(TaskEvent.Canceled, task);
+    this.taskDispatch.dispatch(TaskEvent.CancelInitiated, task);
     res.send(response.success());
   };
 
@@ -170,11 +170,5 @@ export class TaskScheduleController {
       userId: (req.user as IUserSession).sub,
       taskTypeId: type.id,
     };
-  }
-
-  private getErrorPrefix(req: Request) {
-    const params =
-      Object.keys(req.params).length > 0 ? `,params=${JSON.stringify(req.params)}` : "";
-    return `User=${(req.user as IUserSession).sub},${params}`;
   }
 }

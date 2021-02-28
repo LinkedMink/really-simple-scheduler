@@ -26,6 +26,10 @@ export class TaskRunController {
     return;
   };
 
+  cancelHandler = (progress: IProgressModel): void => {
+    return;
+  };
+
   reportProgressHandler = (progress: IProgressModel): void => {
     return;
   };
